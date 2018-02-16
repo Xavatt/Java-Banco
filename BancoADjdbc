@@ -1,0 +1,454 @@
+import java.io.BufferedReader;
+import java.io.PrintWriter;
+import java.io.FileWriter;
+import java.io.*;
+
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.*;
+
+
+
+public class BancoADjdbc
+{
+		private BufferedReader 	archivoIn;
+		private PrintWriter 	archivoOut;
+		Connection conexion;// variable para hacer la conexion con SQL
+		Statement statement;
+		ClienteDP clientedp;
+		DepositoDP depositodp;
+		RetiroDP retirodp;
+
+	public BancoADjdbc()
+	{
+		try
+		{
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			conexion = DriverManager.getConnection("jdbc:mysql://localhost/bancomer?user=root");
+			System.out.println("Todo va bien... Conexion exitosa a la base de datos");
+		}
+		catch(ClassNotFoundException cnfe)
+		{
+			System.out.println("Error 1: "+cnfe);
+		}
+		catch(InstantiationException ie)
+		{
+			System.out.println("Error 2: "+ie);
+		}
+		catch(IllegalAccessException iae)
+		{
+			System.out.println("Error 3: "+iae);
+		}
+		catch(SQLException sqle)
+		{
+			System.out.println("Error 4: "+sqle);
+		}
+	}
+
+	public String capturar(String datos)
+	{
+		String resultado;
+		String insert="";
+
+		System.out.println(datos);
+
+		clientedp = new ClienteDP(datos);
+		insert = "INSERT INTO Cliente VALUES("+clientedp.toStringSql()+")";
+		try
+		{
+			//1. Abrir base de datos para manipular cualquier tabla de la BD
+			statement = conexion.createStatement();//abre la base de datos
+
+			//2. Escribir / almacenar los datos en la BD
+			statement.executeUpdate(insert);
+
+			//3. Cerrar BD
+			statement.close();
+
+			resultado = "Captura Correcta...";
+			System.out.println(insert);
+		}
+		catch(SQLException sql)
+		{
+			System.out.println("Error:  "+sql);
+			resultado = "Error en captura...";
+		}
+		return resultado;
+	}
+
+	public String consultarClientes()
+	{
+		String datos="";
+		String query="";
+		ResultSet resultante=null;
+		query = "SELECT * FROM CLIENTE";
+
+		try
+		{
+			//1. Abrir el archivo para leer
+			statement = conexion.createStatement();
+
+			//1.5 Ejecutar Query
+			resultante = statement.executeQuery(query);
+
+			//2. Procesar datos
+			clientedp = new ClienteDP();
+			while(resultante.next())
+			{
+				clientedp.setNocta(resultante.getString(1));
+				clientedp.setNombre(resultante.getString(2));
+				clientedp.setTipo(resultante.getString(3));
+				clientedp.setSaldo(resultante.getInt(4));
+				clientedp.setFecha(resultante.getString(5));
+				clientedp.setHora(resultante.getString(6));
+
+				datos = datos + clientedp.toString()+"\n";
+			}
+
+			//3. Cerrar archivo
+			statement.close();
+			System.out.println(query);
+
+		}
+		catch(SQLException sql)
+		{
+			System.out.println("Error: "+sql);
+			datos = "Error en lectura de base de datos...";
+		}
+
+		return datos;
+	}
+
+	public String consultarDeposito()
+	{
+			String datos="";
+			String query="";
+			ResultSet resultante=null;
+			query = "SELECT * FROM DEPOSITO";
+
+			try
+			{
+				//1. Abrir el archivo para leer
+				statement = conexion.createStatement();
+
+				//1.5 Ejecutar Query
+				resultante = statement.executeQuery(query);
+
+				//2. Procesar datos
+				depositodp = new DepositoDP();
+				while(resultante.next()){
+					depositodp.setNocta(resultante.getString(1));
+					depositodp.setTipo(resultante.getString(2));
+					depositodp.setSaldoAntes(resultante.getInt(3));
+					depositodp.setCantidad(resultante.getInt(4));
+					depositodp.setSaldoNuevo(resultante.getInt(5));
+					depositodp.setFecha(resultante.getString(6));
+					depositodp.setHora(resultante.getString(7));
+
+					datos = datos + depositodp.toString()+"\n";
+				}
+
+				//3. Cerrar archivo
+				statement.close();
+				System.out.println(query);
+
+			}
+			catch(SQLException sql)
+			{
+				System.out.println("Error: "+sql);
+				datos = "Error en lectura de base de datos...";
+			}
+
+			return datos;
+		}
+
+	public String consultarRetiro()
+	{
+			String datos="";
+			String query="";
+			ResultSet resultante=null;
+			query = "SELECT * FROM RETIRO";
+
+			try
+			{
+				//1. Abrir el archivo para leer
+				statement = conexion.createStatement();
+
+				//1.5 Ejecutar Query
+				resultante = statement.executeQuery(query);
+
+				//2. Procesar datos
+				retirodp = new RetiroDP();
+				while(resultante.next()){
+					retirodp.setNocta(resultante.getString(1));
+					retirodp.setTipo(resultante.getString(2));
+					retirodp.setSaldoAntes(resultante.getInt(3));
+					retirodp.setCantidad(resultante.getInt(4));
+					retirodp.setSaldoNuevo(resultante.getInt(5));
+					retirodp.setFecha(resultante.getString(6));
+					retirodp.setHora(resultante.getString(7));
+
+					datos = datos + retirodp.toString()+"\n";
+				}
+
+				//3. Cerrar archivo
+				statement.close();
+				System.out.println(query);
+
+			}
+			catch(SQLException sql)
+			{
+				System.out.println("Error: "+sql);
+				datos = "Error en lectura de base de datos...";
+			}
+
+			return datos;
+		}
+
+	public String consultarCuenta(String cta)
+  {
+		String datos="";
+		String query="";
+		ResultSet resultante = null;
+		query="SELECT * FROM CLIENTE WHERE NOCTA = '"+cta+"'";
+
+		try
+		{
+			statement = conexion.createStatement();
+
+			resultante = statement.executeQuery(query);
+
+			clientedp = new ClienteDP();
+			while(resultante.next()){
+				clientedp.setNocta(resultante.getString(1));
+				clientedp.setNombre(resultante.getString(2));
+				clientedp.setTipo(resultante.getString(3));
+				clientedp.setSaldo(resultante.getInt(4));
+				clientedp.setFecha(resultante.getString(5));
+				clientedp.setHora(resultante.getString(6));
+
+				datos = datos + clientedp.toString()+"\n";
+			}
+
+			statement.close();
+			System.out.println(query);
+		}
+		catch(SQLException sql)
+		{
+			System.out.println("Error: "+sql);
+			datos = "Error en lectura de base datos...";
+		}
+
+		return datos;
+	}
+
+	public String deposito(String cta, int monto, String fecha, String hora)
+	{
+		String datos="";
+		String resultado="";
+		String tipoCta;
+		int antes, nuevo=0;
+		int cantidad=0;
+		boolean incorrecto = false;
+
+		datos = consultarCuenta(cta);
+		if(!datos.isEmpty())
+		{
+			if(monto ==0)
+			{
+				do
+				{
+					incorrecto = false;
+					try
+					{
+						cantidad = Integer.parseInt(JOptionPane.showInputDialog("Cantidad a Depositar"));
+						if(cantidad<=0)
+							incorrecto = true;
+					}
+					catch(NumberFormatException nfe){
+						incorrecto = true;
+						JOptionPane.showMessageDialog(null,"Ingreso incorrecto");
+					}
+				}while(incorrecto);
+			}
+			else
+			{
+				cantidad=monto;
+				System.out.println("cantidad: "+cantidad);
+			}
+			 	   tipoCta = clientedp.getTipo().toUpperCase();
+			 	   antes = clientedp.getSaldo();
+
+			 System.out.println("Tipo: "+ tipoCta + " antes: "+antes);
+
+			 if(tipoCta.equals("AHORRO")|| tipoCta.equals("INVERSION"))
+			 {
+			 	//System.out.println("Entro al if de ahorro/Inversion");
+					nuevo = antes + cantidad;
+			 }
+			 else
+			 {
+			 	//System.out.println("Entro al if de credito");
+				 if(tipoCta.equals("CREDITO")||tipoCta.equals("HIPOTECA"))
+				 {
+				 	nuevo = antes - cantidad;
+				 	System.out.println("El nuevo saldo es: "+nuevo);
+				 }
+			 }
+
+			 clientedp.setSaldo(nuevo);
+			 String insert="";
+			 String insertCliente="";
+
+
+			 depositodp = new DepositoDP(cta+"_"+tipoCta+"_"+antes+"_"+cantidad+"_"+nuevo+"_"+fecha+"_"+hora);
+
+
+			 insert = "INSERT INTO deposito VALUES("+depositodp.toStringSql()+")";
+			 insertCliente = "UPDATE CLIENTE SET saldo= "+nuevo+" WHERE nocta='"+cta+"'";
+
+			 System.out.println(insertCliente);
+				try
+				{
+					//1. Abrir base de datos para manipular cualquier tabla de la BD
+					statement = conexion.createStatement();//abre la base de datos
+
+					//2. Escribir / almacenar los datos en la BD
+					statement.executeUpdate(insert);
+					statement.executeUpdate(insertCliente);
+
+					//3. Cerrar BD
+					statement.close();
+
+					resultado = "Deposito exitoso";
+					System.out.println(insert);
+				}
+				catch(SQLException sql)
+				{
+					System.out.println("Error:  "+sql);
+					resultado = "Error en deposito...";
+				}
+
+				}
+				else
+				{
+					resultado ="Error en No.cta";
+				}
+
+		return resultado;
+	}
+
+	public String retiro(String cta, int monto, String fecha, String hora)
+	{
+		String datos="";
+		String resultado="";
+		String tipoCta;
+		int antes, nuevo=0;
+		int cantidad=0;
+		boolean incorrecto = false;
+
+		datos = consultarCuenta(cta);
+		if(!datos.isEmpty())
+		{
+			if(monto ==0){
+				do
+				{
+					incorrecto = false;
+					try
+					{
+						cantidad = Integer.parseInt(JOptionPane.showInputDialog("Cantidad a Retirar"));
+						if(cantidad<=0)
+							incorrecto = true;
+					}
+					catch(NumberFormatException nfe)
+					{
+						incorrecto = true;
+						JOptionPane.showMessageDialog(null,"Ingreso incorrecto");
+					}
+				}while(incorrecto);
+			}
+			else
+			{
+				cantidad=monto;
+				System.out.println("cantidad: "+cantidad);
+			}
+			 	   tipoCta = clientedp.getTipo().toUpperCase();
+			 	   antes = clientedp.getSaldo();
+
+			 System.out.println("Tipo: "+ tipoCta + " antes: "+antes);
+
+		     if(tipoCta.equals("HIPOTECA"))
+				 {
+					 	resultado ="No puedes retirar de HIPOTECAS";
+					 	nuevo  = antes;
+			 	}
+				else
+				{
+			 		 if(tipoCta.equals("AHORRO")|| tipoCta.equals("INVERSION"))
+					 {
+						 	System.out.println("Entro al if de ahorro/Inversion");
+						 	if(antes>cantidad)
+							{
+								nuevo = antes - cantidad;
+						 	}
+						 	else
+							{
+						 		resultado ="Error.... No hay suficiente saldo";
+						 	}
+						 }
+						 else
+						 {
+						 		System.out.println("Entro al if de credito");
+							 if(tipoCta.equals("CREDITO"))
+							 {
+							 	nuevo = antes + cantidad;
+							 	System.out.println("Entro al if credito y el nuevo saldo es: "+nuevo);
+							 }
+						 }
+
+						 clientedp.setSaldo(nuevo);
+						 String insert="";
+						 String insertCliente="";
+			 		 		retirodp = new RetiroDP(cta+"_"+tipoCta+"_"+antes+"_"+cantidad+"_"+nuevo+"_"+fecha+"_"+hora);
+
+						 insert = "INSERT INTO retiro VALUES("+retirodp.toStringSql()+")";
+						 insertCliente = "UPDATE CLIENTE SET saldo= "+nuevo+" WHERE nocta='"+cta+"'";
+
+			 System.out.println(insertCliente);
+				try
+				{
+					//1. Abrir base de datos para manipular cualquier tabla de la BD
+					statement = conexion.createStatement();//abre la base de datos
+
+					//2. Escribir / almacenar los datos en la BD
+					statement.executeUpdate(insert);
+					statement.executeUpdate(insertCliente);
+
+					//3. Cerrar BD
+					statement.close();
+
+					resultado = "Retiro exitoso";
+					System.out.println(insert);
+				}
+				catch(SQLException sql)
+				{
+					System.out.println("Error:  "+sql);
+					resultado = "Error en retiro...";
+				}
+			}
+		}
+				else
+				{
+					resultado ="Error en No.cta";
+				}
+
+		return resultado;
+	}
+
+}
