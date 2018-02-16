@@ -1,3 +1,7 @@
+/**
+ * Se escriben las librerias que van a ser usadas
+ */
+
 import javax.swing.*;
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -22,6 +26,10 @@ import java.util.GregorianCalendar;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+
+/**
+ * ----Fin de librerias---
+ */
 
 public class ClienteGUI extends JFrame implements ActionListener
 {
@@ -119,6 +127,11 @@ public class ClienteGUI extends JFrame implements ActionListener
     setVisible(true);
   }
 
+  /**
+   * [inactivarBotones description]
+   *  Inactiva los botones (CAPTURAR, CONSULTAR, CONSULTARNOCUENTA)
+   *  Activa los botones (RETIROS, DEPOSITOS, CANCELAR)
+   */
   private void inactivarBotones()
   {
       bCapturar.setEnabled(false);
@@ -130,6 +143,11 @@ public class ClienteGUI extends JFrame implements ActionListener
       bCancelar.setEnabled(true);
   }
 
+  /**
+   * [activarBotones description]
+   * Activa los botones (CAPTURAR, CONSULTAR, CONSULTARNOCUENTA)
+   * Inactiva los botones (RETIROS, DEPOSITOS, CANCELAR)
+   */
   private void activarBotones()
   {
       bCapturar.setEnabled(true);
@@ -165,6 +183,14 @@ public class ClienteGUI extends JFrame implements ActionListener
 		tfFechaApertura.setText(st.nextToken()+" "+st.nextToken());
 	}
 
+  /**
+   * [obtenerDatos description]
+   * Obtiene los datos escritos en los Jlabels y los organiza con StringTokenizer para ser manipulados más facilmente
+   * de misma manera en esta funcion se hace la creacion de la fecha y en la hora en la cual se hizo el registro de
+   * crear un nuevo cliente.
+   * @return [description]
+   * Regresa 'datos' = El valor de los datos obtenidos para futuras funciones
+   */
   private String obtenerDatos()
   {
     String datos= "";
@@ -194,10 +220,19 @@ public class ClienteGUI extends JFrame implements ActionListener
       return datos;
   }
 
+  /**
+   * [actionPerformed description]
+   * Aquí se encuentran el funcionamiento que tiene cada boton del programa
+   * @param ActionEvent e [description]
+   * Va a ocurrir la funcion de cada boton siempre y cuando se obtenga el evento 'e' comparandolo con el boton precionado
+   */
   public void actionPerformed(ActionEvent e)
   {
     String datos,respuesta;
-
+    /**
+     * [if Capturar description]
+     * Como funciona el boton Capturar (captura de datos - bancoadjdbc funcion [capturar])
+     */
     if(e.getSource() == bCapturar)
     {
       // 1. Obtene Datos
@@ -213,12 +248,28 @@ public class ClienteGUI extends JFrame implements ActionListener
         // 3. Desplegar el resultado de transaccion
       taDatos.setText(respuesta);
     }
+    /**
+     * ----FIN CAPTURAR----
+     */
+
+    /**
+     * [if Consultar description]
+     * Como funciona el boton Consultar (consulta general - bancoadjdbc funcion [consultarClientes])
+     */
     if(e.getSource() == bConsultar)
     {
         datos = bancoadjdbc.consultarClientes();
 
         taDatos.setText(datos);
     }
+    /**
+     * ----FIN CONSULTAR (GENERAL)----
+     */
+
+    /**
+     * [if Consultar No. Cuenta description]
+     * Como funciona el boton consultar No. Cuenta (consulta el No. de Cuenta y habilita botones - bancoadjdbc funcion [consultarCuenta])
+     */
     if(e.getSource() == bConsultarNocta)
     {
       //1. Obtener numero de la cuenta de tfNocta
@@ -236,6 +287,14 @@ public class ClienteGUI extends JFrame implements ActionListener
       //3. Desplegar resultado de la transaccion
       taDatos.setText(respuesta);
     }
+    /**
+     * ----FIN CONSULTAR (CUENTA)----
+     */
+
+    /**
+     * [if Deposito description]
+     * Como funciona el deposito (Aparte de depositar se añade a la tabla de depositos y se registra el deposito hecho - bancoadjdbc funcion [deposito])
+     */
     if(e.getSource() == bDeposito)
     {
       String cta = tfNocta.getText();
@@ -248,6 +307,14 @@ public class ClienteGUI extends JFrame implements ActionListener
        	taDatos.setText(datos);
         activarBotones();
     }
+    /**
+     * ----FIN DEPOSITO----
+     */
+
+     /**
+      * [if Deposito description]
+      * Como funciona el retiro (Aparte de depositar se añade a la tabla de retiro y se registra el retiro hecho - bancoadjdbc funcion [retiro])
+      */
     if(e.getSource() == bRetiros)
     {
       String cta = tfNocta.getText();
@@ -260,6 +327,14 @@ public class ClienteGUI extends JFrame implements ActionListener
 			taDatos.setText(datos);
         activarBotones();
     }
+    /**
+     * ----FIN RETIRO----
+     */
+
+     /**
+      * [if Consultar Retiros description]
+      * Como funciona ConsultarRetiros (Imprime los retiros hechos de todas las cuentas - bancoadjdbc funcion [consultarRetiro])
+      */
     if(e.getSource() == bConsultarRetiros)
     {
      datos = bancoadjdbc.consultarRetiro();
@@ -270,6 +345,14 @@ public class ClienteGUI extends JFrame implements ActionListener
 				taDatos.setText(datos);
 			}
     }
+    /**
+     * ----FIN CONSULTAR RETIRO----
+     */
+
+     /**
+      * [if Consultar Depositos description]
+      * Como funciona ConsultarDepositos (Imprime los depositos hechos de todas las cuentas - bancoadjdbc funcion [consultarDeposito])
+      */
     if(e.getSource() == bConsultarDepositos)
     {
        datos = bancoadjdbc.consultarDeposito();
@@ -280,10 +363,21 @@ public class ClienteGUI extends JFrame implements ActionListener
         taDatos.setText(datos);
 			}
     }
+    /**
+     * ----FIN CONSULTAR DEPOSITO----
+     */
+
+    /**
+     * [if Cancelar description]
+     * Como funciona Cancelar (Una vez siendo habilitado por el boton Consultar No Cuenta permite al usuario cancelar su operacion)
+     */
     if(e.getSource() == bCancelar)
     {
         activarBotones();
     }
+    /**
+     * ----FIN CANCELAR----
+     */
     if(e.getSource() == bSalir)
     {
         System.exit(0);
