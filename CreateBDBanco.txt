@@ -1,0 +1,45 @@
+CREATE TABLE Cliente(Nocta VARCHAR(10) NOT NULL,
+			Nombre VARCHAR(15) NOT NULL,
+			Tipo VARCHAR(15) NOT NULL,
+			Saldo int(11) NOT NULL,
+			FechaApertura date NOT NULL,
+			Hora VARCHAR(10) NOT NULL,
+			PRIMARY KEY(Nocta));
+
+CREATE TABLE deposito(nocta varchar(6) NOT NULL,
+ 		      tipo   VARCHAR(15) NOT NULL,
+                      saldoAnterior INTEGER NOT NULL,
+                      cantidad INTEGER  NOT NULL,
+		      saldoNuevo INTEGER NOT NULL,
+		      fechaDeposits date NOT NULL,
+		      hora varchar(15) NOT NULL,
+		      FOREIGN KEY(nocta) REFERENCES Cliente(nocta));
+
+CREATE TABLE retiro(nocta varchar(6) NOT NULL,
+ 		    tipo   VARCHAR(15) NOT NULL,
+                    saldoAnterior INTEGER NOT NULL,
+                    cantidad INTEGER  NOT NULL,
+		    saldoNuevo INTEGER NOT NULL,
+		    fechaRetiro date NOT NULL,
+		    hora varchar(15) NOT NULL,
+		    FOREIGN KEY(nocta) REFERENCES Cliente(nocta));
+
+
+CREATE TABLE transferencia(noctaRetiro varchar(7) NOT NULL,
+ 		      	   tipoRetiro   VARCHAR(15) NOT NULL,
+                           saldoAnteriorRetiro INTEGER NOT NULL,
+                           cantidadRetiro INTEGER  NOT NULL,
+		           saldoNuevoRetiro INTEGER NOT NULL,		     
+			   noctaDeposito varchar(7) NOT NULL,
+ 		     	   tipoDeposito   VARCHAR(15) NOT NULL,
+                      	   saldoAnteriorDeposito INTEGER NOT NULL,
+                           cantidadDeposito INTEGER  NOT NULL,
+		           saldoNuevoDeposito INTEGER NOT NULL,
+		           fechaTransferencia date NOT NULL,
+		           horaTransferencia varchar(15) NOT NULL,
+			   FOREIGN KEY(noctaRetiro) REFERENCES Cliente(nocta),
+			   FOREIGN KEY(noctaDeposito) REFERENCES Cliente(nocta));
+
+
+
+			
